@@ -18,7 +18,7 @@ logging.basicConfig(
 
 app = Flask(__name__)
 
-# --- Фоновая задача для периодического логирования ---
+# --- Фоновая задача для периодического логирования (пример) ---
 def periodic_logger():
     """Каждые 10 секунд записывает в лог 'Periodic log message: the bot is running'."""
     while True:
@@ -31,19 +31,24 @@ thread.start()
 
 @app.route('/talkme_webhook', methods=['POST'])
 def talkme_webhook():
-    # Пример обработки webhook от Talk-Me
     data = request.get_json(force=True)
     token = data.get("token", "")
     incoming_text = data.get("message", {}).get("text", "")
 
     logging.info(f"Получен webhook от Talk-Me: token={token}, text={incoming_text}")
 
-    reply_text = f"Вы написали: {incoming_text}\nСпасибо за обращение!"
+    # Пример: разные ответы в зависимости от текста
+    if incoming_text.lower() == "/start":
+        reply_text = "Добро пожаловать! Чем могу помочь?"
+    else:
+        reply_text = f"Вы написали: {incoming_text}\nСпасибо за обращение!"
+
+    # Посылаем ответ в Talk-Me, но теперь указываем type="message"
     url = "https://lcab.talk-me.ru/json/v1.0/customBot/send"
     body = {
         "content": {
-            "type": "comment",
-            "comment": reply_text
+            "type": "message",      # вместо "comment"
+            "message": reply_text   # поле "message", вместо "comment"
         }
     }
     headers = {
@@ -58,12 +63,11 @@ def talkme_webhook():
 
 @app.route('/', methods=['GET'])
 def index():
-    """Маршрут проверки: при открытии браузером покажет, что бот с логированием запущен."""
-    logging.info("GET / -> 'Bot with logging is running'")
-    return "Bot with logging is running", 200
+    logging.info("GET / -> Bot with message-based content is running")
+    return "Bot with message-based content is running", 200
 
 if __name__ == '__main__':
-    # Локальный запуск. На хостинге uWSGI/Gunicorn самостоятельно запустит app
     app.run(port=5000, debug=True)
+
 
 
