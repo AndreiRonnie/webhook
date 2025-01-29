@@ -6,9 +6,17 @@ from flask import Flask, request
 import requests
 import openai
 
+# NEW: Подключаем dotenv
+from dotenv import load_dotenv
+
 # ------------------------------------------------------
-# 1) Настройка прокси (если вам действительно нужно 
-#    отправлять запросы к OpenAI через прокси)
+# 1) Загрузка переменных окружения из .env
+# ------------------------------------------------------
+load_dotenv()  # Эта функция автоматически найдёт и загрузит .env, если он лежит рядом.
+openai.api_key = os.getenv("OPENAI_API_KEY", "")
+
+# ------------------------------------------------------
+# 2) Настройка прокси (если нужно)
 # ------------------------------------------------------
 proxy_host = "213.225.237.177"
 proxy_port = "9239"
@@ -20,12 +28,7 @@ os.environ['http_proxy'] = proxy_url
 os.environ['https_proxy'] = proxy_url
 
 # ------------------------------------------------------
-# 2) Настройка OpenAI API
-# ------------------------------------------------------
-openai.api_key = "sk-sJkin25L76lyn34kLtuh0gp6KLGVh64JmEXhfZI_XjT3BlbkFJ71ug9rtGDrotO3iNxFdvXeI5jb8OzX3yE1jnfSnEgA"  # <-- вставьте сюда реальный API-ключ
-
-# ------------------------------------------------------
-# 3) Логирование в файл
+# 3) Логирование
 # ------------------------------------------------------
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 LOGFILE_PATH = os.path.join(BASE_DIR, 'bot.log')
@@ -36,13 +39,8 @@ logging.basicConfig(
     format='%(asctime)s [%(levelname)s] %(message)s'
 )
 
-# ------------------------------------------------------
-# Flask-приложение
-# ------------------------------------------------------
 app = Flask(__name__)
 
-# Фоновая задача: каждые 10 секунд записывать в лог,
-# чтобы было видно, что бот "жив"
 def periodic_logger():
     while True:
         logging.info("Periodic log message: the bot is running")
@@ -51,42 +49,27 @@ def periodic_logger():
 thread = threading.Thread(target=periodic_logger, daemon=True)
 thread.start()
 
-# ------------------------------------------------------
-# Функция для вызова ChatGPT
-# ------------------------------------------------------
 def get_chatgpt_response(user_text):
-    """
-    Отправляем текст пользователя в ChatGPT (модель gpt-3.5-turbo).
-    Можно настроить "роль" и "поведение" бота через "system"-сообщение.
-    """
     try:
-        # Здесь задаём системное сообщение (роль), можно изменить
         system_role = (
             "Ты — дружелюбный ассистент, который отвечает чётко, кратко и по делу. "
             "Если пользователь задаёт вопрос, дай полезный ответ. "
             "По возможности используй вежливую, дружелюбную лексику."
         )
-
         response = openai.ChatCompletion.create(
             model="gpt-3.5-turbo",
             messages=[
                 {"role": "system", "content": system_role},
                 {"role": "user", "content": user_text}
             ],
-            temperature=0.7,  # Степень "творчества" (0.0 - максимально детерминирован, 1.0 - более разнообразен)
+            temperature=0.7,
         )
-        # Достаём ответ из структуры
         answer = response["choices"][0]["message"]["content"]
         return answer
-
     except Exception as e:
         logging.error(f"Ошибка при запросе к ChatGPT: {e}")
-        # Можно вернуть какую-то фразу по умолчанию
         return "Извините, произошла ошибка при запросе к ИИ."
 
-# ------------------------------------------------------
-# Маршрут для приёма вебхуков от Talk-Me
-# ------------------------------------------------------
 @app.route('/talkme_webhook', methods=['POST'])
 def talkme_webhook():
     data = request.get_json(force=True)
@@ -95,14 +78,12 @@ def talkme_webhook():
 
     logging.info(f"Получен webhook от Talk-Me: token={token}, text={incoming_text}")
 
-    # Вместо простого ответа, спрашиваем ChatGPT
     reply_text = get_chatgpt_response(incoming_text)
 
-    # Формируем запрос обратно в Talk-Me
     url = "https://lcab.talk-me.ru/json/v1.0/customBot/send"
     body = {
         "content": {
-            "text": reply_text  # в их документации пример: {"content": {"text": "string"}}
+            "text": reply_text
         }
     }
     headers = {
@@ -110,27 +91,19 @@ def talkme_webhook():
         "Content-Type": "application/json"
     }
 
-    # Отправляем ответ в Talk-Me
     response = requests.post(url, json=body, headers=headers)
     logging.info(f"Отправили ответ в Talk-Me: {response.status_code} {response.text}")
 
-    # Возвращаем OK, чтобы Talk-Me знал, что вебхук обработан
     return "OK", 200
 
-# ------------------------------------------------------
-# Маршрут проверки
-# ------------------------------------------------------
 @app.route('/', methods=['GET'])
 def index():
     logging.info("GET / -> Bot with ChatGPT is running")
     return "Bot with ChatGPT is running", 200
 
-# ------------------------------------------------------
-# Локальный запуск (не используется на боевом хостинге,
-# там uWSGI/Gunicorn сами вызывают app)
-# ------------------------------------------------------
 if __name__ == '__main__':
     app.run(port=5000, debug=True)
+
 
 
 

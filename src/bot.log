@@ -1,0 +1,46 @@
+2025-01-28 16:43:46,622 [INFO] Periodic log message: the bot is running
+2025-01-28 16:43:46,657 [INFO] [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2025-01-28 16:43:46,657 [INFO] [33mPress CTRL+C to quit[0m
+2025-01-28 16:43:46,658 [INFO]  * Restarting with stat
+2025-01-28 16:43:47,471 [INFO] Periodic log message: the bot is running
+2025-01-28 16:43:47,482 [WARNING]  * Debugger is active!
+2025-01-28 16:43:47,484 [INFO]  * Debugger PIN: 226-069-618
+2025-01-28 16:43:56,624 [INFO] Periodic log message: the bot is running
+2025-01-28 16:43:57,472 [INFO] Periodic log message: the bot is running
+2025-01-28 16:44:06,624 [INFO] Periodic log message: the bot is running
+2025-01-28 16:44:07,474 [INFO] Periodic log message: the bot is running
+2025-01-28 16:44:16,624 [INFO] Periodic log message: the bot is running
+2025-01-28 16:44:17,474 [INFO] Periodic log message: the bot is running
+2025-01-28 16:44:26,625 [INFO] Periodic log message: the bot is running
+2025-01-28 16:44:27,476 [INFO] Periodic log message: the bot is running
+2025-01-28 16:44:36,625 [INFO] Periodic log message: the bot is running
+2025-01-28 16:44:37,476 [INFO] Periodic log message: the bot is running
+2025-01-28 16:44:46,626 [INFO] Periodic log message: the bot is running
+2025-01-28 16:44:47,477 [INFO] Periodic log message: the bot is running
+2025-01-28 16:44:56,626 [INFO] Periodic log message: the bot is running
+2025-01-28 16:44:57,477 [INFO] Periodic log message: the bot is running
+2025-01-28 16:45:06,627 [INFO] Periodic log message: the bot is running
+2025-01-28 16:45:07,478 [INFO] Periodic log message: the bot is running
+2025-01-28 16:45:16,627 [INFO] Periodic log message: the bot is running
+2025-01-28 16:45:17,479 [INFO] Periodic log message: the bot is running
+2025-01-28 16:45:26,628 [INFO] Periodic log message: the bot is running
+2025-01-28 16:45:27,479 [INFO] Periodic log message: the bot is running
+2025-01-28 16:45:36,628 [INFO] Periodic log message: the bot is running
+2025-01-28 16:45:37,479 [INFO] Periodic log message: the bot is running
+2025-01-28 16:45:46,629 [INFO] Periodic log message: the bot is running
+2025-01-28 16:45:47,480 [INFO] Periodic log message: the bot is running
+2025-01-28 16:45:56,629 [INFO] Periodic log message: the bot is running
+2025-01-28 16:45:57,481 [INFO] Periodic log message: the bot is running
+2025-01-28 16:46:06,630 [INFO] Periodic log message: the bot is running
+2025-01-28 16:46:07,482 [INFO] Periodic log message: the bot is running
+2025-01-28 16:46:16,630 [INFO] Periodic log message: the bot is running
+2025-01-28 16:46:17,482 [INFO] Periodic log message: the bot is running
+2025-01-28 16:46:26,630 [INFO] Periodic log message: the bot is running
+2025-01-28 16:46:27,482 [INFO] Periodic log message: the bot is running
+2025-01-28 16:46:36,631 [INFO] Periodic log message: the bot is running
+2025-01-28 16:46:37,483 [INFO] Periodic log message: the bot is running
+2025-01-28 16:46:46,631 [INFO] Periodic log message: the bot is running
+2025-01-28 16:46:47,484 [INFO] Periodic log message: the bot is running
+2025-01-28 16:46:56,631 [INFO] Periodic log message: the bot is running
+2025-01-28 16:46:57,485 [INFO] Periodic log message: the bot is running
