@@ -20,9 +20,9 @@ os.environ['http_proxy'] = proxy_url
 os.environ['https_proxy'] = proxy_url
 
 # ------------------------------------------------------
-# 2) Настройка OpenAI API (новый синтаксис: openai.Chat)
+# 2) Настройка OpenAI API
 # ------------------------------------------------------
-openai.api_key = "sk-sJkin25L76lyn34kLtuh0gp6KLGVh64JmEXhfZI_XjT3BlbkFJ71ug9rtGDrotO3iNxFdvXeI5jb8OzX3yE1jnfSnEgA"
+openai.api_key = "sk-sJkin25L76lyn34kLtuh0gp6KLGVh64JmEXhfZI_XjT3BlbkFJ71ug9rtGDrotO3iNxFdvXeI5jb8OzX3yE1jnfSnEgA"  # <-- вставьте сюда реальный API-ключ
 
 # ------------------------------------------------------
 # 3) Логирование в файл
@@ -52,7 +52,7 @@ thread = threading.Thread(target=periodic_logger, daemon=True)
 thread.start()
 
 # ------------------------------------------------------
-# Функция для вызова ChatGPT (с новым методом openai.Chat)
+# Функция для вызова ChatGPT
 # ------------------------------------------------------
 def get_chatgpt_response(user_text):
     """
@@ -60,22 +60,22 @@ def get_chatgpt_response(user_text):
     Можно настроить "роль" и "поведение" бота через "system"-сообщение.
     """
     try:
+        # Здесь задаём системное сообщение (роль), можно изменить
         system_role = (
             "Ты — дружелюбный ассистент, который отвечает чётко, кратко и по делу. "
             "Если пользователь задаёт вопрос, дай полезный ответ. "
             "По возможности используй вежливую, дружелюбную лексику."
         )
 
-        # Используем новый синтаксис openai.Chat.create
-        response = openai.Chat.create(
+        response = openai.ChatCompletion.create(
             model="gpt-3.5-turbo",
             messages=[
                 {"role": "system", "content": system_role},
                 {"role": "user", "content": user_text}
             ],
-            temperature=0.7,  # Степень "творчества"
+            temperature=0.7,  # Степень "творчества" (0.0 - максимально детерминирован, 1.0 - более разнообразен)
         )
-        # Достаём ответ
+        # Достаём ответ из структуры
         answer = response["choices"][0]["message"]["content"]
         return answer
 
@@ -102,7 +102,7 @@ def talkme_webhook():
     url = "https://lcab.talk-me.ru/json/v1.0/customBot/send"
     body = {
         "content": {
-            "text": reply_text
+            "text": reply_text  # в их документации пример: {"content": {"text": "string"}}
         }
     }
     headers = {
@@ -131,4 +131,7 @@ def index():
 # ------------------------------------------------------
 if __name__ == '__main__':
     app.run(port=5000, debug=True)
+
+
+
 
