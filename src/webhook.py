@@ -32,8 +32,8 @@ proxy_user = "user27099"
 proxy_pass = "qf08ja"
 
 proxy_url = f"http://{proxy_user}:{proxy_pass}@{proxy_host}:{proxy_port}"
-os.environ['http_proxy'] = proxy_url
-os.environ['https_proxy'] = proxy_url
+#os.environ['http_proxy'] = proxy_url
+#os.environ['https_proxy'] = proxy_url
 
 # ------------------------------------------------------
 # 2) Настройка OpenAI API (старый синтаксис ChatCompletion)
