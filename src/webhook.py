@@ -6,18 +6,14 @@ from flask import Flask, request
 import requests
 import openai
 
-# NEW: Подключаем dotenv
+# Для загрузки .env (если используете подход с .env)
 from dotenv import load_dotenv
 
-# ------------------------------------------------------
-# 1) Загрузка переменных окружения из .env
-# ------------------------------------------------------
-load_dotenv()  # Эта функция автоматически найдёт и загрузит .env, если он лежит рядом.
+# Загружаем переменные окружения
+load_dotenv()
+
 openai.api_key = os.getenv("OPENAI_API_KEY", "")
 
-# ------------------------------------------------------
-# 2) Настройка прокси (если нужно)
-# ------------------------------------------------------
 proxy_host = "213.225.237.177"
 proxy_port = "9239"
 proxy_user = "user27099"
@@ -27,9 +23,6 @@ proxy_url = f"http://{proxy_user}:{proxy_pass}@{proxy_host}:{proxy_port}"
 os.environ['http_proxy'] = proxy_url
 os.environ['https_proxy'] = proxy_url
 
-# ------------------------------------------------------
-# 3) Логирование
-# ------------------------------------------------------
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 LOGFILE_PATH = os.path.join(BASE_DIR, 'bot.log')
 
@@ -56,7 +49,9 @@ def get_chatgpt_response(user_text):
             "Если пользователь задаёт вопрос, дай полезный ответ. "
             "По возможности используй вежливую, дружелюбную лексику."
         )
-        response = openai.ChatCompletion.create(
+
+        # Новый синтаксис: вместо openai.ChatCompletion -> openai.Chat
+        response = openai.Chat.create(
             model="gpt-3.5-turbo",
             messages=[
                 {"role": "system", "content": system_role},
@@ -64,8 +59,10 @@ def get_chatgpt_response(user_text):
             ],
             temperature=0.7,
         )
+
         answer = response["choices"][0]["message"]["content"]
         return answer
+
     except Exception as e:
         logging.error(f"Ошибка при запросе к ChatGPT: {e}")
         return "Извините, произошла ошибка при запросе к ИИ."
@@ -103,8 +100,3 @@ def index():
 
 if __name__ == '__main__':
     app.run(port=5000, debug=True)
-
-
-
-
-
