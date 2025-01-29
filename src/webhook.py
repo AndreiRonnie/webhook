@@ -7,10 +7,11 @@ from requests.packages.urllib3.exceptions import InsecureRequestWarning
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 # Настраиваем логирование
+LOGFILE_PATH = "/webhook.studentshelper.ru/www/src/bot.log"
 logging.basicConfig(
-filename='bot.log', # Имя лог-файла
-level=logging.DEBUG, # Уровень логирования
-format='%(asctime)s - %(levelname)s - %(message)s' # Формат записей
+    filename=LOGFILE_PATH,
+    level=logging.DEBUG,
+    format='%(asctime)s - %(levelname)s - %(message)s'
 )
 logger = logging.getLogger(__name__)
 
