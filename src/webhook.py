@@ -6,14 +6,25 @@ from requests.packages.urllib3.exceptions import InsecureRequestWarning
 # Отключаем предупреждения о SSL (только для тестирования)
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
-# Настраиваем логирование
-LOGFILE_PATH = "/webhook.studentshelper.ru/www/src/bot.log"
+# Определяем путь к текущей папке и к файлу лога
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+LOGFILE_PATH = os.path.join(BASE_DIR, 'bot.log')
+
+# Настраиваем логгер
 logging.basicConfig(
     filename=LOGFILE_PATH,
-    level=logging.DEBUG,
-    format='%(asctime)s - %(levelname)s - %(message)s'
+    level=logging.INFO,
+    format='%(asctime)s [%(levelname)s] %(message)s'
 )
 logger = logging.getLogger(__name__)
+
+def periodic_logger():
+    while True:
+        logging.info("Periodic log message: the bot is running")
+        time.sleep(10)
+
+thread = threading.Thread(target=periodic_logger, daemon=True)
+thread.start()
 
 proxy_user = "user27099"
 proxy_pass = "qf08ja"
