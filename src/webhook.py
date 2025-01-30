@@ -1,73 +1,90 @@
 import os
+import requests
 import logging
 import time
 import threading
-from flask import Flask, request
-import requests
+from requests.packages.urllib3.exceptions import InsecureRequestWarning
 
-# Определяем путь к текущей папке и к файлу лога
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-LOGFILE_PATH = os.path.join(BASE_DIR, 'bot.log')
+# Отключаем предупреждения о SSL (только для тестирования)
+requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
-# Настраиваем логгер
+# Настраиваем логирование
 logging.basicConfig(
-    filename=LOGFILE_PATH,
-    level=logging.INFO,
-    format='%(asctime)s [%(levelname)s] %(message)s'
+    filename='bot.log',  # Имя лог-файла
+    level=logging.DEBUG, # Уровень логирования
+    format='%(asctime)s - %(levelname)s - %(message)s'
 )
+logger = logging.getLogger(__name__)
 
-app = Flask(__name__)
+proxy_user = "user27099"
+proxy_pass = "qf08ja"
+proxy_host = "213.225.237.177"
+proxy_port = "9239"
+proxy_url = f"http://{proxy_user}:{proxy_pass}@{proxy_host}:{proxy_port}"
 
-# Пример фонового потока, который пишет в лог каждые 10 секунд (для наглядности)
-def periodic_logger():
-    while True:
-        logging.info("Periodic log message: the bot is running")
-        time.sleep(10)
+proxies = {
+    "http": proxy_url,
+    "https": proxy_url
+}
 
-thread = threading.Thread(target=periodic_logger, daemon=True)
-thread.start()
+# Ваш токен аутентификации (замените на реальный)
+auth_token = "your_auth_token_here"
 
-@app.route('/talkme_webhook', methods=['POST'])
-def talkme_webhook():
-    data = request.get_json(force=True)
-    token = data.get("token", "")
-    incoming_text = data.get("message", {}).get("text", "")
-
-    logging.info(f"Получен webhook от Talk-Me: token={token}, text={incoming_text}")
-
-    # Логика ответа
-    if incoming_text.lower() == "/start":
-        reply_text = "Добро пожаловать! Чем могу помочь?"
-    else:
-        reply_text = f"Вы написали: {incoming_text}\nСпасибо за обращение!"
-
-    # Ссылаемся на /customBot/send
-    url = "https://lcab.talk-me.ru/json/v1.0/customBot/send"
-
-    # --- Главное отличие: "content": {"text": "..."} ---
-    body = {
-        "content": {
-            "text": reply_text
-        }
-    }
+try:
+    logger.info("Отправляем GET-запрос к https://api.openai.com/v1/models через прокси...")
+    logger.debug(f"Прокси URL: {proxy_url}")
 
     headers = {
-        "X-Token": token,
-        "Content-Type": "application/json"
+        'Authorization': f'Bearer {auth_token}'
     }
 
-    response = requests.post(url, json=body, headers=headers)
-    logging.info(f"Отправили ответ в Talk-Me: {response.status_code} {response.text}")
+    r = requests.get(
+        "https://api.openai.com/v1/models",
+        proxies=proxies,
+        verify=False,
+        timeout=30,
+        headers=headers
+    )
+    logger.info(f"Status code: {r.status_code}")
+    logger.info(f"Response text: {r.text}")
 
-    return "OK", 200
+except Exception as e:
+    logger.error(f"Ошибка при запросе: {e}")
+    logger.debug(f"Дополнительная информация об ошибке: {str(e)}")
 
-@app.route('/', methods=['GET'])
-def index():
-    logging.info("GET / -> Bot with text-based content is running")
-    return "Bot with text-based content is running", 200
 
-if __name__ == '__main__':
-    app.run(port=5000, debug=True)
+# Попробуем использовать другой прокси-сервер (если есть)
+alternative_proxy_host = "новый_прокси_хост"  # Замените на реальный хост
+alternative_proxy_port = "новый_прокси_порт"  # Замените на реальный порт
+
+alternative_proxy_url = f"http://{proxy_user}:{proxy_pass}@{alternative_proxy_host}:{alternative_proxy_port}"
+alternative_proxies = {
+    "http": alternative_proxy_url,
+    "https": alternative_proxy_url
+}
+
+try:
+    logger.info("Отправляем GET-запрос к https://api.openai.com/v1/models через альтернативный прокси...")
+    logger.debug(f"Альтернативный прокси URL: {alternative_proxy_url}")
+
+    headers = {
+        'Authorization': f'Bearer {auth_token}'
+    }
+
+    r = requests.get(
+        "https://api.openai.com/v1/models",
+        proxies=alternative_proxies,
+        verify=False,
+        timeout=30,
+        headers=headers
+    )
+    logger.info(f"Status code: {r.status_code}")
+    logger.info(f"Response text: {r.text}")
+
+except Exception as e:
+    logger.error(f"Ошибка при запросе через альтернативный прокси: {e}")
+    logger.debug(f"Дополнительная информация об ошибке: {str(e)}")
+
 
 
 

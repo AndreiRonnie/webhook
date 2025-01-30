@@ -1,0 +1,27 @@
+2025-01-30 15:40:13,047 [INFO] Periodic log message: the bot is running
+2025-01-30 15:40:13,098 [INFO] [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2025-01-30 15:40:13,098 [INFO] [33mPress CTRL+C to quit[0m
+2025-01-30 15:40:13,099 [INFO]  * Restarting with stat
+2025-01-30 15:40:13,684 [INFO] Periodic log message: the bot is running
+2025-01-30 15:40:13,702 [WARNING]  * Debugger is active!
+2025-01-30 15:40:13,710 [INFO]  * Debugger PIN: 226-069-618
+2025-01-30 15:40:23,049 [INFO] Periodic log message: the bot is running
+2025-01-30 15:40:23,685 [INFO] Periodic log message: the bot is running
+2025-01-30 15:50:10,146 - INFO - Отправляем GET-запрос к https://api.openai.com/v1/models через прокси...
+2025-01-30 15:50:10,146 - DEBUG - Прокси URL: http://user27099:qf08ja@213.225.237.177:9239
+2025-01-30 15:50:10,148 - DEBUG - Starting new HTTPS connection (1): api.openai.com:443
+2025-01-30 15:50:10,956 - DEBUG - https://api.openai.com:443 "GET /v1/models HTTP/11" 401 249
+2025-01-30 15:50:10,957 - INFO - Status code: 401
+2025-01-30 15:50:10,957 - INFO - Response text: {
+  "error": {
+    "message": "Incorrect API key provided: your_aut********here. You can find your API key at https://platform.openai.com/account/api-keys.",
+    "type": "invalid_request_error",
+    "param": null,
+    "code": "invalid_api_key"
+  }
+}
+2025-01-30 15:50:10,957 - INFO - Отправляем GET-запрос к https://api.openai.com/v1/models через альтернативный прокси...
+2025-01-30 15:50:10,957 - DEBUG - Альтернативный прокси URL: http://user27099:qf08ja@новый_прокси_хост:новый_прокси_порт
+2025-01-30 15:50:10,957 - ERROR - Ошибка при запросе через альтернативный прокси: Failed to parse: http://user27099:qf08ja@новый_прокси_хост:новый_прокси_порт
+2025-01-30 15:50:10,957 - DEBUG - Дополнительная информация об ошибке: Failed to parse: http://user27099:qf08ja@новый_прокси_хост:новый_прокси_порт
