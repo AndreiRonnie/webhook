@@ -1,90 +1,136 @@
 import os
-import requests
 import logging
 import time
 import threading
-from requests.packages.urllib3.exceptions import InsecureRequestWarning
+from flask import Flask, request
+import requests
+import openai
 
-# Отключаем предупреждения о SSL (только для тестирования)
-requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
-
-# Настраиваем логирование
-logging.basicConfig(
-    filename='bot.log',  # Имя лог-файла
-    level=logging.DEBUG, # Уровень логирования
-    format='%(asctime)s - %(levelname)s - %(message)s'
-)
-logger = logging.getLogger(__name__)
-
-proxy_user = "user27099"
-proxy_pass = "qf08ja"
+# ------------------------------------------------------
+# 1) Настройка прокси (если вам действительно нужно 
+#    отправлять запросы к OpenAI через прокси)
+# ------------------------------------------------------
 proxy_host = "213.225.237.177"
 proxy_port = "9239"
+proxy_user = "user27099"
+proxy_pass = "qf08ja"
+
 proxy_url = f"http://{proxy_user}:{proxy_pass}@{proxy_host}:{proxy_port}"
+os.environ['http_proxy'] = proxy_url
+os.environ['https_proxy'] = proxy_url
 
-proxies = {
-    "http": proxy_url,
-    "https": proxy_url
-}
+# ------------------------------------------------------
+# 2) Настройка OpenAI API
+# ------------------------------------------------------
+openai.api_key = "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"  # <-- вставьте сюда реальный API-ключ
 
-# Ваш токен аутентификации (замените на реальный)
-auth_token = "your_auth_token_here"
+# ------------------------------------------------------
+# 3) Логирование в файл
+# ------------------------------------------------------
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+LOGFILE_PATH = os.path.join(BASE_DIR, 'bot.log')
 
-try:
-    logger.info("Отправляем GET-запрос к https://api.openai.com/v1/models через прокси...")
-    logger.debug(f"Прокси URL: {proxy_url}")
+logging.basicConfig(
+    filename=LOGFILE_PATH,
+    level=logging.INFO,
+    format='%(asctime)s [%(levelname)s] %(message)s'
+)
 
+# ------------------------------------------------------
+# Flask-приложение
+# ------------------------------------------------------
+app = Flask(__name__)
+
+# Фоновая задача: каждые 10 секунд записывать в лог,
+# чтобы было видно, что бот "жив"
+def periodic_logger():
+    while True:
+        logging.info("Periodic log message: the bot is running")
+        time.sleep(10)
+
+thread = threading.Thread(target=periodic_logger, daemon=True)
+thread.start()
+
+# ------------------------------------------------------
+# Функция для вызова ChatGPT
+# ------------------------------------------------------
+def get_chatgpt_response(user_text):
+    """
+    Отправляем текст пользователя в ChatGPT (модель gpt-3.5-turbo).
+    Можно настроить "роль" и "поведение" бота через "system"-сообщение.
+    """
+    try:
+        # Здесь задаём системное сообщение (роль), можно изменить
+        system_role = (
+            "Ты — дружелюбный ассистент, который отвечает чётко, кратко и по делу. "
+            "Если пользователь задаёт вопрос, дай полезный ответ. "
+            "По возможности используй вежливую, дружелюбную лексику."
+        )
+
+        response = openai.ChatCompletion.create(
+            model="gpt-3.5-turbo",
+            messages=[
+                {"role": "system", "content": system_role},
+                {"role": "user", "content": user_text}
+            ],
+            temperature=0.7,  # Степень "творчества" (0.0 - максимально детерминирован, 1.0 - более разнообразен)
+        )
+        # Достаём ответ из структуры
+        answer = response["choices"][0]["message"]["content"]
+        return answer
+
+    except Exception as e:
+        logging.error(f"Ошибка при запросе к ChatGPT: {e}")
+        # Можно вернуть какую-то фразу по умолчанию
+        return "Извините, произошла ошибка при запросе к ИИ."
+
+# ------------------------------------------------------
+# Маршрут для приёма вебхуков от Talk-Me
+# ------------------------------------------------------
+@app.route('/talkme_webhook', methods=['POST'])
+def talkme_webhook():
+    data = request.get_json(force=True)
+    token = data.get("token", "")
+    incoming_text = data.get("message", {}).get("text", "")
+
+    logging.info(f"Получен webhook от Talk-Me: token={token}, text={incoming_text}")
+
+    # Вместо простого ответа, спрашиваем ChatGPT
+    reply_text = get_chatgpt_response(incoming_text)
+
+    # Формируем запрос обратно в Talk-Me
+    url = "https://lcab.talk-me.ru/json/v1.0/customBot/send"
+    body = {
+        "content": {
+            "text": reply_text  # в их документации пример: {"content": {"text": "string"}}
+        }
+    }
     headers = {
-        'Authorization': f'Bearer {auth_token}'
+        "X-Token": token,
+        "Content-Type": "application/json"
     }
 
-    r = requests.get(
-        "https://api.openai.com/v1/models",
-        proxies=proxies,
-        verify=False,
-        timeout=30,
-        headers=headers
-    )
-    logger.info(f"Status code: {r.status_code}")
-    logger.info(f"Response text: {r.text}")
+    # Отправляем ответ в Talk-Me
+    response = requests.post(url, json=body, headers=headers)
+    logging.info(f"Отправили ответ в Talk-Me: {response.status_code} {response.text}")
 
-except Exception as e:
-    logger.error(f"Ошибка при запросе: {e}")
-    logger.debug(f"Дополнительная информация об ошибке: {str(e)}")
+    # Возвращаем OK, чтобы Talk-Me знал, что вебхук обработан
+    return "OK", 200
 
+# ------------------------------------------------------
+# Маршрут проверки
+# ------------------------------------------------------
+@app.route('/', methods=['GET'])
+def index():
+    logging.info("GET / -> Bot with ChatGPT is running")
+    return "Bot with ChatGPT is running", 200
 
-# Попробуем использовать другой прокси-сервер (если есть)
-alternative_proxy_host = "новый_прокси_хост"  # Замените на реальный хост
-alternative_proxy_port = "новый_прокси_порт"  # Замените на реальный порт
-
-alternative_proxy_url = f"http://{proxy_user}:{proxy_pass}@{alternative_proxy_host}:{alternative_proxy_port}"
-alternative_proxies = {
-    "http": alternative_proxy_url,
-    "https": alternative_proxy_url
-}
-
-try:
-    logger.info("Отправляем GET-запрос к https://api.openai.com/v1/models через альтернативный прокси...")
-    logger.debug(f"Альтернативный прокси URL: {alternative_proxy_url}")
-
-    headers = {
-        'Authorization': f'Bearer {auth_token}'
-    }
-
-    r = requests.get(
-        "https://api.openai.com/v1/models",
-        proxies=alternative_proxies,
-        verify=False,
-        timeout=30,
-        headers=headers
-    )
-    logger.info(f"Status code: {r.status_code}")
-    logger.info(f"Response text: {r.text}")
-
-except Exception as e:
-    logger.error(f"Ошибка при запросе через альтернативный прокси: {e}")
-    logger.debug(f"Дополнительная информация об ошибке: {str(e)}")
-
+# ------------------------------------------------------
+# Локальный запуск (не используется на боевом хостинге,
+# там uWSGI/Gunicorn сами вызывают app)
+# ------------------------------------------------------
+if __name__ == '__main__':
+    app.run(port=5000, debug=True)
 
 
 
