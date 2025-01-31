@@ -22,7 +22,7 @@ os.environ['https_proxy'] = proxy_url
 # ------------------------------------------------------
 # 2) Настройка OpenAI API
 # ------------------------------------------------------
-openai.api_key = "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"  # <-- вставьте сюда реальный API-ключ
+openai.api_key = "sk-sJkin25L76lyn34kLtuh0gp6KLGVh64JmEXhfZI_XjT3BlbkFJ71ug9rtGDrotO3iNxFdvXeI5jb8OzX3yE1jnfSnEgA"  # <-- вставьте сюда реальный API-ключ
 
 # ------------------------------------------------------
 # 3) Логирование в файл
