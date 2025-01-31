@@ -1,0 +1,15 @@
+2025-01-31 14:23:02,350 [INFO] Periodic log message: the bot is running
+2025-01-31 14:23:12,361 [INFO] Periodic log message: the bot is running
+2025-01-31 14:23:22,371 [INFO] Periodic log message: the bot is running
+2025-01-31 14:23:32,381 [INFO] Periodic log message: the bot is running
+2025-01-31 14:23:42,391 [INFO] Periodic log message: the bot is running
+2025-01-31 14:23:52,401 [INFO] Periodic log message: the bot is running
+2025-01-31 14:24:02,411 [INFO] Periodic log message: the bot is running
+2025-01-31 14:24:12,421 [INFO] Periodic log message: the bot is running
+2025-01-31 14:24:21,016 [INFO] Получен webhook от Talk-Me: token=946e22478bb56c29a34c463b3a6191943f8f471cbec2696bb8f5ea8a47409324a96ed579e70131a5ebacb66c5551c7ea7d6359946b1e504d061ed53fd8da83ac0474e586a9f8c683ddfbcb4b8989ba0e6e070d71e441d5f3b58a0f56718041cc645585fea48cf8e11ccccd6a22c31f11bdd91e2da35c70400d5777413b159f78, text=/start
+2025-01-31 14:24:21,607 [INFO] error_code=invalid_api_key error_message='Incorrect API key provided: sk-proj-********************************************************************************************************************************************************cSQA. You can find your API key at https://platform.openai.com/account/api-keys.' error_param=None error_type=invalid_request_error message='OpenAI API error received' stream_error=False
+2025-01-31 14:24:21,607 [ERROR] Ошибка при запросе к ChatGPT: Incorrect API key provided: sk-proj-********************************************************************************************************************************************************cSQA. You can find your API key at https://platform.openai.com/account/api-keys.
+2025-01-31 14:24:22,431 [INFO] Periodic log message: the bot is running
+2025-01-31 14:24:22,484 [INFO] Отправили ответ в Talk-Me: 200 {"success":true}
+2025-01-31 14:24:32,441 [INFO] Periodic log message: the bot is running
+2025-01-31 14:24:42,451 [INFO] Periodic log message: the bot is running
